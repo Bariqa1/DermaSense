@@ -6,7 +6,7 @@
     <title>DermaSense AI – Facial Skin Disease & Acne Severity Analysis</title>
     <meta name="description" content="Hierarchical deep learning platform for real-time facial skin condition diagnosis and acne severity grading using EfficientNet-B0.">
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%230284c7%22 stroke-width=%222.5%22><path d=%22M12 2v20M2 12h20%22/></svg>">
 </head>
 <body>
     <!-- Top Navigation -->
@@ -81,25 +81,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Test Samples -->
-                <div class="samples-wrapper">
-                    <span class="samples-label">Quick Clinical Demo Samples:</span>
-                    <div class="samples-grid">
-                        <button type="button" class="btn-sample" data-sample="acne">
-                            <span>🔴</span> Acne Case
-                        </button>
-                        <button type="button" class="btn-sample" data-sample="eczema">
-                            <span>🟠</span> Eczema Case
-                        </button>
-                        <button type="button" class="btn-sample" data-sample="melanoma">
-                            <span>🟤</span> Melanoma Case
-                        </button>
-                        <button type="button" class="btn-sample" data-sample="clear">
-                            <span>🟢</span> Clear Skin
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Inference Button -->
                 <button id="analyzeBtn" class="btn-primary" disabled>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -123,12 +104,21 @@
 
                 <!-- Empty State Placeholder -->
                 <div class="empty-state" id="emptyState">
-                    <div class="empty-state-icon">🔬</div>
+                    <div class="empty-state-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-dim);">
+                            <path d="M6 18h8"/>
+                            <path d="M3 22h18"/>
+                            <path d="M14 22a7 7 0 1 0-14 0"/>
+                            <path d="M9 14h2"/>
+                            <path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/>
+                            <path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/>
+                        </svg>
+                    </div>
                     <p style="font-size: 1.05rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.4rem;">
                         No Examination Data
                     </p>
                     <p style="font-size: 0.85rem; max-width: 340px; margin: 0 auto;">
-                        Upload a well-lit dermoscopy or close-up facial photograph, or choose one of the quick test samples on the left.
+                        Upload a well-lit dermoscopy or close-up facial photograph to initiate automated clinical triage.
                     </p>
                 </div>
 

@@ -110,14 +110,18 @@ Evaluated on 796 held-out clinical test cases across 9 diagnostic categories:
 
 ### 3. Stage 2: Acne Severity Grading Performance
 
-Quantification of Acne Vulgaris across 4 standardized severity levels (0 - 3) using balanced random sampling:
+Quantification of Acne Vulgaris across 4 standardized severity levels (0 - 3) evaluated on 224 held-out clinical test cases:
+
+- **Adjacent Accuracy (±1 Severity Grade)**: **99.55%** (223 / 224 cases classified accurately or within one adjacent grade, proving high ordinal reliability).
+- **Actionable Clinical Triage (Mild vs Severe)**: **93.75%** (Reliable differentiation between home OTC regimens and specialist dermatologist intervention).
+- **Exact 4-Level Test Accuracy (TTA-Enhanced)**: **70.54%** (Standard: 67.86%, Macro F1: 0.718).
 
 | Severity Level | Precision | Recall | F1-Score | Clinical Recommendation |
 | :--- | :---: | :---: | :---: | :--- |
-| **Level 0 (Clear / Almost Clear)** | **74.4%** | **80.3%** | 0.772 | Gentle non-comedogenic cleanser, SPF 30+ daily |
-| **Level 1 (Mild Acne)** | **78.7%** | **72.2%** | 0.753 | Topical OTC Salicylic Acid / Benzoyl Peroxide |
-| **Level 2 (Moderate Acne)** | **61.8%** | **72.4%** | 0.667 | Topical retinoid (Adapalene/Tretinoin) + antimicrobial |
-| **Level 3 (Severe Acne)** | **73.7%** | **63.6%** | 0.683 | Dermatologist consult (Oral antibiotics / Isotretinoin) |
+| **Level 0 (Clear / Almost Clear)** | **67.0%** | **82.9%** | 0.741 | Gentle non-comedogenic cleanser, SPF 30+ daily |
+| **Level 1 (Mild Acne)** | **77.5%** | **56.7%** | 0.655 | Topical OTC Salicylic Acid / Benzoyl Peroxide |
+| **Level 2 (Moderate Acne)** | **61.1%** | **75.9%** | 0.677 | Topical retinoid (Adapalene/Tretinoin) + antimicrobial |
+| **Level 3 (Severe Acne)** | **78.3%** | **81.8%** | **0.800** | Dermatologist consult (Oral antibiotics / Isotretinoin) |
 
 <p align="center">
   <img src="results/confusion_matrix_stage2.png" alt="Stage 2 Confusion Matrix" width="550"/>
