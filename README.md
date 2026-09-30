@@ -1,4 +1,4 @@
-# DermaSense 🩺🔬
+# DermaSense
 ### Hierarchical Deep Learning for Facial Skin Disease Diagnosis & Acne Severity Grading
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
@@ -11,7 +11,7 @@
 
 ---
 
-## 🌟 Key Highlights
+## Key Highlights
 
 1. **Two-Stage Hierarchical Classification**:
    - **Stage 1 (Disease Diagnosis):** 9-class differential diagnosis covering inflammatory dermatoses, benign growths, and life-threatening malignancies (*Eczema*, *Melanoma*, *Basal Cell Carcinoma*, *Psoriasis*, *Seborrheic Keratoses*, *Benign Keratosis*, *Melanocytic Nevi*, *Acne*, *Clear Skin*).
@@ -25,7 +25,7 @@
 
 ---
 
-## 🧠 System Architecture
+## System Architecture
 
 ```text
                +----------------------------------+
@@ -61,7 +61,7 @@
 
 ---
 
-## 📊 Empirical Results & Model Benchmarks
+## Empirical Results & Model Benchmarks
 
 DermaSense underwent rigorous empirical evaluation comparing baseline convolutional networks, deep transfer learning backbones, and medical focal loss fine-tuning across 6,700+ dermatological images.
 
@@ -73,7 +73,7 @@ DermaSense underwent rigorous empirical evaluation comparing baseline convolutio
 | **Stage 2: Acne Severity** | EfficientNet-B0 (MPS Retrained, Balanced) | **74.11%** | 0.719 | 4-Level Severity Quantification |
 | **EfficientNet-B0 (Standard)** | ImageNet Pretrained / Softmax Fine-Tuned | **84.20%** | 0.839 | Standard Deep Learning |
 | **Hybrid: SVM (RBF Kernel)** | EfficientNet Embeddings + PCA (95%) | **85.60%** | 0.852 | Classical Kernel Model |
-| **Stage 1 (MedicalFocalLoss)** | **EfficientNet-B0 + Focal Loss (MPS)** | **88.32%** ⭐ | **0.887** | **Top Model (Peak Val: 89.92%)** |
+| **Stage 1 (MedicalFocalLoss)** | **EfficientNet-B0 + Focal Loss (MPS)** | **88.32%** | **0.887** | **Top Model (Peak Val: 89.92%)** |
 
 <p align="center">
   <img src="results/model_comparison_bar_chart.png" alt="Model Comparison Bar Chart" width="720"/>
@@ -87,7 +87,7 @@ Evaluated on 796 held-out clinical test cases across 9 diagnostic categories:
 
 | Clinical Condition | Precision | Recall | F1-Score | Clinical Role & Significance |
 | :--- | :---: | :---: | :---: | :--- |
-| **Melanoma** | **95.5%** | **93.3%** | **0.944** | ⭐ **Malignancy Early Triage (Minimal False Alarms)** |
+| **Melanoma** | **95.5%** | **93.3%** | **0.944** | **Malignancy Early Triage (Minimal False Alarms)** |
 | **Melanocytic Nevi** | **92.2%** | **92.2%** | **0.922** | Benign mole differential |
 | **Basal Cell Carcinoma (BCC)** | **91.1%** | **91.1%** | **0.911** | Most common non-melanoma skin cancer |
 | **Clear / Almost Clear Skin** | **92.4%** | **80.3%** | **0.859** | Healthy epidermal benchmark |
@@ -99,8 +99,11 @@ Evaluated on 796 held-out clinical test cases across 9 diagnostic categories:
 | **Macro Average / Total** | **88.6%** | **88.2%** | **0.882** | **Overall Accuracy: 88.32% (796 samples)** |
 
 <p align="center">
-  <img src="results/confusion_matrix_stage1.png" alt="Stage 1 Confusion Matrix" width="48%"/>
-  <img src="results/training_curves.png" alt="Training Convergence Curves" width="48%"/>
+  <img src="results/confusion_matrix_stage1.png" alt="Stage 1 Confusion Matrix" width="620"/>
+</p>
+
+<p align="center">
+  <img src="results/training_curves.png" alt="Training Convergence Curves" width="760"/>
 </p>
 
 ---
@@ -131,7 +134,7 @@ All models were retrained natively on an **Apple Silicon MacBook Pro (M Pro)** l
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 DermaSense/
@@ -163,7 +166,7 @@ DermaSense/
 
 ---
 
-## 🚀 Quickstart & Installation
+## Quickstart & Installation
 
 ### 1. Clone the Repository
 ```bash
@@ -196,7 +199,7 @@ Open your browser and navigate to: **`http://localhost:8000`**
 
 ---
 
-## 📡 REST API Reference
+## REST API Reference
 
 ### Health Check
 - **Endpoint**: `GET /api/health`
@@ -244,18 +247,18 @@ Open your browser and navigate to: **`http://localhost:8000`**
 
 ---
 
-## 🔬 Datasets Utilized
+## Datasets Utilized
 
 - **Skin Diseases Multi-Class Dataset**: [Kaggle skin-diseases-image-dataset](https://www.kaggle.com/datasets/ismailpromus/skin-diseases-image-dataset)
 - **Acne04 Facial Dataset**: [Kaggle acne04](https://www.kaggle.com/datasets/jincyjis/acne04) containing 4 standardized severity grading levels.
 
 ---
 
-## ⚖️ Clinical Disclaimer
+## Clinical Disclaimer
 
 *DermaSense is intended strictly as a research investigation tool and decision-support prototype. It is not approved as an independent diagnostic medical device. Final clinical management must always be determined by licensed dermatologists and confirmed via histopathology when indicated.*
 
 ---
 
-## 📄 License
+## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
