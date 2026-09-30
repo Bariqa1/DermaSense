@@ -5,124 +5,124 @@
       "f1_macro": 0.405,
       "status": "Baseline Scratch Model"
     },
+    "Stage 2 (Acne Severity)": {
+      "test_accuracy": 0.7411,
+      "f1_macro": 0.719,
+      "status": "Balanced Clinical Retraining"
+    },
     "EfficientNet-B0 (Softmax)": {
       "test_accuracy": 0.842,
       "f1_macro": 0.839,
-      "status": "End-to-End Fine-Tuning"
-    },
-    "MLP Classifier (Hybrid)": {
-      "test_accuracy": 0.848,
-      "f1_macro": 0.844,
-      "status": "PCA + Dense Head"
+      "status": "Standard Fine-Tuning"
     },
     "SVM (RBF Kernel)": {
       "test_accuracy": 0.856,
       "f1_macro": 0.852,
       "status": "PCA + Kernel SVM"
     },
-    "Hybrid: Logistic Regression": {
-      "test_accuracy": 0.8702,
-      "f1_macro": 0.875,
-      "status": "Top Documented Benchmark \u2b50"
+    "Stage 1 (MedicalFocalLoss)": {
+      "test_accuracy": 0.8832,
+      "f1_macro": 0.887,
+      "status": "Top Live Retrained Benchmark (Melanoma F1: 0.944)"
     }
   },
   "stage1_classification_report": {
     "Acne": {
-      "precision": 0.9,
-      "recall": 0.88,
-      "f1_score": 0.89,
-      "support": 210
+      "precision": 0.848,
+      "recall": 0.933,
+      "f1_score": 0.889,
+      "support": 90
     },
     "Basal Cell Carcinoma": {
-      "precision": 0.88,
-      "recall": 0.89,
-      "f1_score": 0.88,
-      "support": 204
+      "precision": 0.911,
+      "recall": 0.911,
+      "f1_score": 0.911,
+      "support": 90
     },
     "Benign Keratosis": {
-      "precision": 0.85,
-      "recall": 0.84,
-      "f1_score": 0.85,
-      "support": 204
+      "precision": 0.875,
+      "recall": 0.856,
+      "f1_score": 0.865,
+      "support": 90
     },
     "Clear_AlmostClear": {
-      "precision": 0.94,
-      "recall": 0.95,
-      "f1_score": 0.95,
-      "support": 211
+      "precision": 0.924,
+      "recall": 0.803,
+      "f1_score": 0.859,
+      "support": 76
     },
     "Eczema": {
-      "precision": 0.88,
-      "recall": 0.88,
-      "f1_score": 0.88,
-      "support": 205
+      "precision": 0.808,
+      "recall": 0.933,
+      "f1_score": 0.866,
+      "support": 90
     },
     "Melanocytic Nevi": {
-      "precision": 0.89,
-      "recall": 0.92,
-      "f1_score": 0.9,
-      "support": 206
+      "precision": 0.922,
+      "recall": 0.922,
+      "f1_score": 0.922,
+      "support": 90
     },
     "Melanoma": {
-      "precision": 0.99,
-      "recall": 0.935,
-      "f1_score": 0.962,
-      "support": 214
+      "precision": 0.955,
+      "recall": 0.933,
+      "f1_score": 0.944,
+      "support": 90
     },
     "Psoriasis": {
-      "precision": 0.88,
-      "recall": 0.88,
-      "f1_score": 0.88,
-      "support": 207
+      "precision": 0.831,
+      "recall": 0.767,
+      "f1_score": 0.798,
+      "support": 90
     },
     "Seborrheic Keratoses": {
-      "precision": 0.89,
-      "recall": 0.9,
-      "f1_score": 0.89,
-      "support": 205
+      "precision": 0.898,
+      "recall": 0.878,
+      "f1_score": 0.888,
+      "support": 90
     },
-    "accuracy": 0.8702,
+    "accuracy": 0.8832,
     "macro_avg": {
-      "precision": 0.9,
-      "recall": 0.898,
-      "f1_score": 0.898
+      "precision": 0.886,
+      "recall": 0.882,
+      "f1_score": 0.882
     },
     "weighted_avg": {
-      "precision": 0.899,
-      "recall": 0.8702,
-      "f1_score": 0.884
+      "precision": 0.885,
+      "recall": 0.8832,
+      "f1_score": 0.883
     }
   },
   "stage2_severity_report": {
     "Level 0 (Clear)": {
-      "precision": 0.92,
-      "recall": 0.9,
-      "f1_score": 0.91,
-      "support": 109
+      "precision": 0.744,
+      "recall": 0.803,
+      "f1_score": 0.772,
+      "support": 76
     },
     "Level 1 (Mild)": {
-      "precision": 0.83,
-      "recall": 0.82,
-      "f1_score": 0.83,
-      "support": 111
+      "precision": 0.787,
+      "recall": 0.722,
+      "f1_score": 0.753,
+      "support": 97
     },
     "Level 2 (Moderate)": {
-      "precision": 0.82,
-      "recall": 0.84,
-      "f1_score": 0.83,
-      "support": 111
+      "precision": 0.618,
+      "recall": 0.724,
+      "f1_score": 0.667,
+      "support": 29
     },
     "Level 3 (Severe)": {
-      "precision": 0.88,
-      "recall": 0.9,
-      "f1_score": 0.89,
-      "support": 111
+      "precision": 0.737,
+      "recall": 0.636,
+      "f1_score": 0.683,
+      "support": 22
     },
-    "accuracy": 0.865,
+    "accuracy": 0.7411,
     "macro_avg": {
-      "precision": 0.863,
-      "recall": 0.865,
-      "f1_score": 0.864
+      "precision": 0.721,
+      "recall": 0.721,
+      "f1_score": 0.719
     }
   }
 }

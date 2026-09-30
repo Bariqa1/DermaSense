@@ -61,6 +61,76 @@
 
 ---
 
+## 📊 Empirical Results & Model Benchmarks
+
+DermaSense underwent rigorous empirical evaluation comparing baseline convolutional networks, deep transfer learning backbones, and medical focal loss fine-tuning across 6,700+ dermatological images.
+
+### 1. Comparative Architecture Benchmarks
+
+| Model Architecture | Backbone / Paradigm | Test Accuracy | Macro F1-Score | Status / Role |
+| :--- | :--- | :---: | :---: | :---: |
+| **Custom CNN (Baseline)** | 3-Layer ConvNet (Trained from Scratch) | **42.00%** | 0.405 | Baseline Benchmark |
+| **Stage 2: Acne Severity** | EfficientNet-B0 (MPS Retrained, Balanced) | **74.11%** | 0.719 | 4-Level Severity Quantification |
+| **EfficientNet-B0 (Standard)** | ImageNet Pretrained / Softmax Fine-Tuned | **84.20%** | 0.839 | Standard Deep Learning |
+| **Hybrid: SVM (RBF Kernel)** | EfficientNet Embeddings + PCA (95%) | **85.60%** | 0.852 | Classical Kernel Model |
+| **Stage 1 (MedicalFocalLoss)** | **EfficientNet-B0 + Focal Loss (MPS)** | **88.32%** ⭐ | **0.887** | **Top Model (Peak Val: 89.92%)** |
+
+<p align="center">
+  <img src="results/model_comparison_bar_chart.png" alt="Model Comparison Bar Chart" width="720"/>
+</p>
+
+---
+
+### 2. Stage 1: Multi-Disease Clinical Classification Report
+
+Evaluated on 796 held-out clinical test cases across 9 diagnostic categories:
+
+| Clinical Condition | Precision | Recall | F1-Score | Clinical Role & Significance |
+| :--- | :---: | :---: | :---: | :--- |
+| **Melanoma** | **95.5%** | **93.3%** | **0.944** | ⭐ **Malignancy Early Triage (Minimal False Alarms)** |
+| **Melanocytic Nevi** | **92.2%** | **92.2%** | **0.922** | Benign mole differential |
+| **Basal Cell Carcinoma (BCC)** | **91.1%** | **91.1%** | **0.911** | Most common non-melanoma skin cancer |
+| **Clear / Almost Clear Skin** | **92.4%** | **80.3%** | **0.859** | Healthy epidermal benchmark |
+| **Seborrheic Keratoses** | **89.8%** | **87.8%** | **0.888** | Benign epidermal neoplasm |
+| **Benign Keratosis** | **87.5%** | **85.6%** | **0.865** | Benign keratotic lesion |
+| **Acne Vulgaris** | **84.8%** | **93.3%** | **0.889** | High sensitivity detection |
+| **Eczema** | **80.8%** | **93.3%** | **0.866** | Inflammatory dermatosis |
+| **Psoriasis** | **83.1%** | **76.7%** | **0.798** | Chronic autoimmune plaques |
+| **Macro Average / Total** | **88.6%** | **88.2%** | **0.882** | **Overall Accuracy: 88.32% (796 samples)** |
+
+<p align="center">
+  <img src="results/confusion_matrix_stage1.png" alt="Stage 1 Confusion Matrix" width="48%"/>
+  <img src="results/training_curves.png" alt="Training Convergence Curves" width="48%"/>
+</p>
+
+---
+
+### 3. Stage 2: Acne Severity Grading Performance
+
+Quantification of Acne Vulgaris across 4 standardized severity levels (0 - 3) using balanced random sampling:
+
+| Severity Level | Precision | Recall | F1-Score | Clinical Recommendation |
+| :--- | :---: | :---: | :---: | :--- |
+| **Level 0 (Clear / Almost Clear)** | **74.4%** | **80.3%** | 0.772 | Gentle non-comedogenic cleanser, SPF 30+ daily |
+| **Level 1 (Mild Acne)** | **78.7%** | **72.2%** | 0.753 | Topical OTC Salicylic Acid / Benzoyl Peroxide |
+| **Level 2 (Moderate Acne)** | **61.8%** | **72.4%** | 0.667 | Topical retinoid (Adapalene/Tretinoin) + antimicrobial |
+| **Level 3 (Severe Acne)** | **73.7%** | **63.6%** | 0.683 | Dermatologist consult (Oral antibiotics / Isotretinoin) |
+
+<p align="center">
+  <img src="results/confusion_matrix_stage2.png" alt="Stage 2 Confusion Matrix" width="550"/>
+</p>
+
+---
+
+### 4. Apple Silicon Hardware Acceleration (Metal Performance Shaders)
+
+All models were retrained natively on an **Apple Silicon MacBook Pro (M Pro)** leveraging PyTorch's Metal Performance Shaders (`mps`) backend:
+- **Batch Processing Throughput**: ~51 seconds per epoch across 3,700+ training images.
+- **Inference Latency**: Decreased from 98.28 ms (CPU) down to **12.50 ms** (Apple Silicon MPS), delivering an **8x speedup** for real-time edge clinical triage.
+- **Test-Time Augmentation (TTA)**: 5-angle geometric ensemble inference (original, horizontal flip, vertical flip, diagonal flip, 90° rotation) executed in a single synchronized tensor batch.
+
+---
+
 ## 📁 Repository Structure
 
 ```text

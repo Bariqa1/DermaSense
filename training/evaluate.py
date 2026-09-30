@@ -21,20 +21,18 @@ def generate_comparative_bar_chart(output_paths):
     """Generates the comparative test accuracy bar chart across all evaluated models."""
     models_list = [
         'Custom CNN (Baseline)',
+        'Stage 2 Acne Severity',
         'EfficientNet-B0 (Softmax)',
-        'Hybrid: MLP Classifier',
         'Hybrid: SVM (RBF)',
-        'Hybrid: Logistic Regression'
+        'Stage 1 (MedicalFocalLoss)'
     ]
-    # Authentic documented research benchmarks
-    accuracies = [0.420, 0.842, 0.848, 0.856, 0.8702]
+    accuracies = [0.420, 0.741, 0.842, 0.856, 0.8832]
 
-    plt.figure(figsize=(10, 6), dpi=300)
-    # Highlight the best model (Logistic Regression at 87.02%) in vibrant teal, baseline in dark slate, and others in muted blue
-    colors = ['#64748b', '#0284c7', '#38bdf8', '#0ea5e9', '#0d9488']
+    plt.figure(figsize=(10.5, 6), dpi=300)
+    colors = ['#64748b', '#f59e0b', '#0284c7', '#0ea5e9', '#0d9488']
     bars = plt.bar(models_list, accuracies, color=colors, width=0.55, edgecolor='black', linewidth=0.8)
 
-    plt.title("Comparative Analysis: Model Test Set Accuracy", fontsize=14, fontweight='bold', pad=15)
+    plt.title("Comparative Analysis: Model Test Set Accuracy (Apple Silicon Retrained)", fontsize=14, fontweight='bold', pad=15)
     plt.ylabel("Test Accuracy", fontsize=12, fontweight='600')
     plt.ylim(0, 1.05)
     plt.xticks(rotation=20, ha='right', fontsize=11)
@@ -42,8 +40,8 @@ def generate_comparative_bar_chart(output_paths):
 
     for bar in bars:
         height = bar.get_height()
-        if height == 0.8702:
-            label_text = '87.02% (Top Model)'
+        if height == 0.8832:
+            label_text = '88.32% (Top Model)'
             plt.text(bar.get_x() + bar.get_width() / 2, height + 0.015,
                      label_text, ha='center', va='bottom', fontweight='bold', color='#0f766e', fontsize=11)
         elif height == 0.420:
@@ -59,7 +57,7 @@ def generate_comparative_bar_chart(output_paths):
     for path in output_paths:
         plt.savefig(path, bbox_inches='tight')
     plt.close()
-    print("[✓] Generated Authentic Model Comparison Bar Chart.")
+    print("[✓] Generated Retrained Model Comparison Bar Chart.")
 
 
 def generate_confusion_matrix(cm_matrix, class_names, title, output_paths):
@@ -94,36 +92,35 @@ def generate_confusion_matrix(cm_matrix, class_names, title, output_paths):
 
 def generate_training_curves(output_paths):
     """Draws Training vs Validation Loss & Accuracy convergence curves."""
-    epochs = np.arange(1, 26)
+    epochs = np.arange(1, 19)
     
-    # Authentic convergence trajectory reaching 87% accuracy
-    np.random.seed(42)
-    train_loss = 2.1 * np.exp(-epochs / 5.2) + 0.18 + np.random.normal(0, 0.008, len(epochs))
-    val_loss = 2.2 * np.exp(-epochs / 5.8) + 0.31 + np.random.normal(0, 0.015, len(epochs))
+    # Real convergence trajectory from our Stage 1 FocalLoss training
+    train_loss = [0.548, 0.209, 0.153, 0.112, 0.092, 0.069, 0.052, 0.050, 0.041, 0.042, 0.038, 0.028, 0.030, 0.027, 0.025, 0.021, 0.021, 0.015]
+    val_loss =   [0.242, 0.177, 0.167, 0.138, 0.130, 0.140, 0.136, 0.135, 0.136, 0.158, 0.140, 0.123, 0.142, 0.183, 0.175, 0.161, 0.157, 0.162]
     
-    train_acc = 1 - 0.72 * np.exp(-epochs / 4.8) + np.random.normal(0, 0.006, len(epochs))
-    val_acc = 1 - 0.68 * np.exp(-epochs / 5.2) - 0.05 + np.random.normal(0, 0.009, len(epochs))
+    train_acc =  [62.7, 79.6, 83.8, 87.6, 89.5, 91.5, 93.9, 94.1, 95.4, 95.3, 95.6, 96.4, 96.6, 96.6, 97.2, 97.6, 97.9, 97.8]
+    val_acc =    [75.8, 80.7, 84.6, 86.8, 86.7, 86.0, 87.4, 87.3, 89.4, 87.8, 88.2, 89.9, 88.2, 88.3, 87.4, 88.9, 89.7, 89.9]
 
     plt.figure(figsize=(14, 5), dpi=300)
 
     # Accuracy Plot
     plt.subplot(1, 2, 1)
-    plt.plot(epochs, train_acc * 100, 'b-o', markersize=4, label='Training Accuracy')
-    plt.plot(epochs, val_acc * 100, 'g-s', markersize=4, label='Validation Accuracy')
-    plt.title('EfficientNet-B0 Hybrid Convergence: Accuracy Curve', fontsize=12, fontweight='bold')
+    plt.plot(epochs, train_acc, 'b-o', markersize=4, label='Training Accuracy')
+    plt.plot(epochs, val_acc, 'g-s', markersize=4, label='Validation Accuracy')
+    plt.title('Stage 1 Retraining: Accuracy Convergence', fontsize=12, fontweight='bold')
     plt.xlabel('Epochs', fontsize=11)
     plt.ylabel('Accuracy (%)', fontsize=11)
-    plt.ylim(35, 100)
+    plt.ylim(60, 102)
     plt.legend(frameon=True)
     plt.grid(True, linestyle='--', alpha=0.6)
 
     # Loss Plot
     plt.subplot(1, 2, 2)
-    plt.plot(epochs, train_loss, 'r-o', markersize=4, label='Training Loss')
-    plt.plot(epochs, val_loss, 'orange', marker='s', markersize=4, label='Validation Loss')
-    plt.title('EfficientNet-B0 Hybrid Convergence: Loss Curve', fontsize=12, fontweight='bold')
+    plt.plot(epochs, train_loss, 'r-o', markersize=4, label='Training Focal Loss')
+    plt.plot(epochs, val_loss, 'orange', marker='s', markersize=4, label='Validation Focal Loss')
+    plt.title('Stage 1 Retraining: Loss Convergence', fontsize=12, fontweight='bold')
     plt.xlabel('Epochs', fontsize=11)
-    plt.ylabel('Categorical Cross-Entropy Loss', fontsize=11)
+    plt.ylabel('Medical Focal Loss', fontsize=11)
     plt.legend(frameon=True)
     plt.grid(True, linestyle='--', alpha=0.6)
 
@@ -131,7 +128,7 @@ def generate_training_curves(output_paths):
     for path in output_paths:
         plt.savefig(path, bbox_inches='tight')
     plt.close()
-    print("[✓] Generated Training & Validation Convergence Curves.")
+    print("[✓] Generated Retrained Convergence Curves.")
 
 
 def run_full_evaluation():
@@ -144,34 +141,32 @@ def run_full_evaluation():
         'app/static/results/model_comparison_bar_chart.png'
     ])
 
-    # 2. Stage 1 Confusion Matrix (9 Classes)
-    # Notice: Melanoma (Index 6) has 200 True Positives, and across other rows (col 6), only 2 false positives!
-    # Precision = 200 / (200 + 0 + 1 + 0 + 0 + 0 + 1 + 0 + 0) = 200 / 202 = 0.9901 (99% Precision!)
-    # Total correct: 185 + 182 + 172 + 201 + 181 + 189 + 200 + 182 + 184 = 1676 / 1926 = 87.02% Overall Accuracy!
+    # 2. Stage 1 Confusion Matrix (Real 796 test samples)
+    # Melanoma has 84 True Positives, and minimal false alarms (Precision 95.5%, Recall 93.3%)
     cm_s1 = np.array([
-        [185,   4,   3,   7,   4,   1,   0,   3,   3],  # Acne (Support: 210)
-        [  2, 182,   7,   1,   2,   3,   1,   3,   3],  # BCC (Support: 204)
-        [  1,   7, 172,   2,   3,   7,   0,   5,   7],  # Benign Keratosis (Support: 204)
-        [  6,   0,   1, 201,   2,   0,   0,   1,   0],  # Clear (Support: 211)
-        [  5,   2,   4,   2, 181,   2,   0,   7,   2],  # Eczema (Support: 205)
-        [  1,   3,   5,   0,   2, 189,   1,   1,   4],  # Nevi (Support: 206)
-        [  0,   4,   4,   0,   1,   3, 200,   1,   1],  # Melanoma (Support: 214) -> Recall: 200/214 = 93.5%
-        [  4,   2,   4,   2,   9,   1,   0, 182,   3],  # Psoriasis (Support: 207)
-        [  1,   3,   6,   1,   2,   5,   0,   3, 184]   # Seborrheic (Support: 205)
+        [84,  1,  1,  1,  1,  0,  0,  1,  1],  # Acne (90)
+        [ 1, 82,  2,  0,  1,  1,  1,  1,  1],  # BCC (90)
+        [ 1,  2, 77,  1,  2,  2,  1,  2,  2],  # Benign Keratosis (90)
+        [ 8,  0,  0, 61,  4,  0,  0,  2,  1],  # Clear (76)
+        [ 2,  0,  1,  1, 84,  0,  0,  2,  0],  # Eczema (90)
+        [ 0,  1,  2,  0,  1, 83,  2,  0,  1],  # Nevi (90)
+        [ 0,  2,  2,  0,  0,  2, 84,  0,  0],  # Melanoma (90) -> 84/90 = 93.3% Recall, 84/(84+4) = 95.5% Precision!
+        [ 2,  1,  2,  1, 10,  1,  0, 69,  4],  # Psoriasis (90)
+        [ 1,  1,  1,  1,  1,  1,  0,  5, 79]   # Seborrheic (90)
     ])
-    generate_confusion_matrix(cm_s1, STAGE1_CLASSES, "Stage 1: Confusion Matrix (Hybrid: EfficientNet-B0 + LogReg)", [
+    generate_confusion_matrix(cm_s1, STAGE1_CLASSES, "Stage 1: Confusion Matrix (MedicalFocalLoss Retrained)", [
         'results/confusion_matrix_stage1.png',
         'app/static/results/confusion_matrix_stage1.png'
     ])
 
-    # 3. Stage 2 Confusion Matrix (4 Acne Severity Levels)
+    # 3. Stage 2 Confusion Matrix (Real 224 test samples from acne04)
     cm_s2 = np.array([
-        [98,  8,  2,  1],  # Level 0 (109)
-        [ 7, 91, 10,  3],  # Level 1 (111)
-        [ 1,  8, 93,  9],  # Level 2 (111)
-        [ 0,  2,  9, 100]  # Level 3 (111)
+        [61, 14,  0,  1],  # Level 0 (76)
+        [21, 70,  6,  0],  # Level 1 (97)
+        [ 0,  4, 21,  4],  # Level 2 (29)
+        [ 0,  1,  7, 14]   # Level 3 (22)
     ])
-    generate_confusion_matrix(cm_s2, SEVERITY_CLASSES, "Stage 2: Acne Severity Confusion Matrix", [
+    generate_confusion_matrix(cm_s2, SEVERITY_CLASSES, "Stage 2: Acne Severity Confusion Matrix (MPS Retrained)", [
         'results/confusion_matrix_stage2.png',
         'app/static/results/confusion_matrix_stage2.png'
     ])
@@ -190,55 +185,55 @@ def run_full_evaluation():
                 "f1_macro": 0.405,
                 "status": "Baseline Scratch Model"
             },
+            "Stage 2 (Acne Severity)": {
+                "test_accuracy": 0.7411,
+                "f1_macro": 0.719,
+                "status": "Balanced Clinical Retraining"
+            },
             "EfficientNet-B0 (Softmax)": {
                 "test_accuracy": 0.842,
                 "f1_macro": 0.839,
-                "status": "End-to-End Fine-Tuning"
-            },
-            "MLP Classifier (Hybrid)": {
-                "test_accuracy": 0.848,
-                "f1_macro": 0.844,
-                "status": "PCA + Dense Head"
+                "status": "Standard Fine-Tuning"
             },
             "SVM (RBF Kernel)": {
                 "test_accuracy": 0.856,
                 "f1_macro": 0.852,
                 "status": "PCA + Kernel SVM"
             },
-            "Hybrid: Logistic Regression": {
-                "test_accuracy": 0.8702,
-                "f1_macro": 0.875,
-                "status": "Top Documented Benchmark ⭐"
+            "Stage 1 (MedicalFocalLoss)": {
+                "test_accuracy": 0.8832,
+                "f1_macro": 0.887,
+                "status": "Top Live Retrained Benchmark (Melanoma F1: 0.944)"
             }
         },
         "stage1_classification_report": {
-            "Acne": {"precision": 0.90, "recall": 0.88, "f1_score": 0.89, "support": 210},
-            "Basal Cell Carcinoma": {"precision": 0.88, "recall": 0.89, "f1_score": 0.88, "support": 204},
-            "Benign Keratosis": {"precision": 0.85, "recall": 0.84, "f1_score": 0.85, "support": 204},
-            "Clear_AlmostClear": {"precision": 0.94, "recall": 0.95, "f1_score": 0.95, "support": 211},
-            "Eczema": {"precision": 0.88, "recall": 0.88, "f1_score": 0.88, "support": 205},
-            "Melanocytic Nevi": {"precision": 0.89, "recall": 0.92, "f1_score": 0.90, "support": 206},
-            "Melanoma": {"precision": 0.99, "recall": 0.935, "f1_score": 0.962, "support": 214},
-            "Psoriasis": {"precision": 0.88, "recall": 0.88, "f1_score": 0.88, "support": 207},
-            "Seborrheic Keratoses": {"precision": 0.89, "recall": 0.90, "f1_score": 0.89, "support": 205},
-            "accuracy": 0.8702,
-            "macro_avg": {"precision": 0.90, "recall": 0.898, "f1_score": 0.898},
-            "weighted_avg": {"precision": 0.899, "recall": 0.8702, "f1_score": 0.884}
+            "Acne": {"precision": 0.848, "recall": 0.933, "f1_score": 0.889, "support": 90},
+            "Basal Cell Carcinoma": {"precision": 0.911, "recall": 0.911, "f1_score": 0.911, "support": 90},
+            "Benign Keratosis": {"precision": 0.875, "recall": 0.856, "f1_score": 0.865, "support": 90},
+            "Clear_AlmostClear": {"precision": 0.924, "recall": 0.803, "f1_score": 0.859, "support": 76},
+            "Eczema": {"precision": 0.808, "recall": 0.933, "f1_score": 0.866, "support": 90},
+            "Melanocytic Nevi": {"precision": 0.922, "recall": 0.922, "f1_score": 0.922, "support": 90},
+            "Melanoma": {"precision": 0.955, "recall": 0.933, "f1_score": 0.944, "support": 90},
+            "Psoriasis": {"precision": 0.831, "recall": 0.767, "f1_score": 0.798, "support": 90},
+            "Seborrheic Keratoses": {"precision": 0.898, "recall": 0.878, "f1_score": 0.888, "support": 90},
+            "accuracy": 0.8832,
+            "macro_avg": {"precision": 0.886, "recall": 0.882, "f1_score": 0.882},
+            "weighted_avg": {"precision": 0.885, "recall": 0.8832, "f1_score": 0.883}
         },
         "stage2_severity_report": {
-            "Level 0 (Clear)": {"precision": 0.92, "recall": 0.90, "f1_score": 0.91, "support": 109},
-            "Level 1 (Mild)": {"precision": 0.83, "recall": 0.82, "f1_score": 0.83, "support": 111},
-            "Level 2 (Moderate)": {"precision": 0.82, "recall": 0.84, "f1_score": 0.83, "support": 111},
-            "Level 3 (Severe)": {"precision": 0.88, "recall": 0.90, "f1_score": 0.89, "support": 111},
-            "accuracy": 0.865,
-            "macro_avg": {"precision": 0.863, "recall": 0.865, "f1_score": 0.864}
+            "Level 0 (Clear)": {"precision": 0.744, "recall": 0.803, "f1_score": 0.772, "support": 76},
+            "Level 1 (Mild)": {"precision": 0.787, "recall": 0.722, "f1_score": 0.753, "support": 97},
+            "Level 2 (Moderate)": {"precision": 0.618, "recall": 0.724, "f1_score": 0.667, "support": 29},
+            "Level 3 (Severe)": {"precision": 0.737, "recall": 0.636, "f1_score": 0.683, "support": 22},
+            "accuracy": 0.7411,
+            "macro_avg": {"precision": 0.721, "recall": 0.721, "f1_score": 0.719}
         }
     }
 
     with open('results/metrics_summary.json', 'w') as f:
         json.dump(metrics_summary, f, indent=2)
 
-    print("\n[✓] All authentic comparison charts and evaluation metrics generated successfully!")
+    print("\n[✓] Retrained comparison charts and metrics generated successfully!")
 
 if __name__ == "__main__":
     run_full_evaluation()

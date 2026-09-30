@@ -114,7 +114,12 @@ class DermaSensePipeline:
     """
     def __init__(self, s1_weights_path: str, s2_weights_path: str, device: str = None):
         if device is None:
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            if torch.cuda.is_available():
+                self.device = torch.device("cuda")
+            elif torch.backends.mps.is_available():
+                self.device = torch.device("mps")
+            else:
+                self.device = torch.device("cpu")
         else:
             self.device = torch.device(device)
 
@@ -140,25 +145,53 @@ class DermaSensePipeline:
         self.model_s2.to(self.device)
         self.model_s2.eval()
 
-    def predict(self, image: Image.Image) -> Dict[str, Any]:
+    def predict(self, image: Image.Image, use_tta: bool = True) -> Dict[str, Any]:
         """
-        Runs complete inference pipeline on a PIL Image.
-        Returns diagnosis, top-3 differential list, probabilities, and severity (if applicable).
+        Runs complete inference pipeline on a PIL Image with optional Test-Time Augmentation (TTA).
+        Returns diagnosis, top-3 differential list, probabilities, critical alerts, and severity (if applicable).
         """
         if image.mode != "RGB":
             image = image.convert("RGB")
 
-        tensor = self.transforms(image).unsqueeze(0).to(self.device)
+        base_tensor = self.transforms(image)
 
-        # Stage 1: Diagnosis
-        with torch.no_grad():
-            logits_s1 = self.model_s1(tensor)
-            probs_s1 = F.softmax(logits_s1, dim=1)[0].cpu().numpy()
+        if use_tta:
+            # Test-Time Augmentation: 5 distinct geometric orientations for clinical robustness
+            t_orig = base_tensor
+            t_hflip = torch.flip(base_tensor, dims=[2])
+            t_vflip = torch.flip(base_tensor, dims=[1])
+            t_hvflip = torch.flip(base_tensor, dims=[1, 2])
+            t_rot = torch.rot90(base_tensor, k=1, dims=[1, 2])
+            batch_tensor = torch.stack([t_orig, t_hflip, t_vflip, t_hvflip, t_rot]).to(self.device)
+
+            # Stage 1: Diagnosis with TTA Ensemble Averaging
+            with torch.no_grad():
+                logits_s1 = self.model_s1(batch_tensor)
+                probs_s1 = F.softmax(logits_s1, dim=1).mean(dim=0).cpu().numpy()
+        else:
+            tensor = base_tensor.unsqueeze(0).to(self.device)
+            with torch.no_grad():
+                logits_s1 = self.model_s1(tensor)
+                probs_s1 = F.softmax(logits_s1, dim=1)[0].cpu().numpy()
 
         sorted_indices = probs_s1.argsort()[::-1]
         top_idx = int(sorted_indices[0])
         primary_disease = STAGE1_CLASSES[top_idx]
         primary_prob = float(probs_s1[top_idx])
+
+        # Clinical Safeguard: Critical Malignancy Early Alert
+        # If Melanoma probability is elevated (>20%) even if not the top ranked label
+        melanoma_idx = STAGE1_CLASSES.index("Melanoma")
+        melanoma_prob = float(probs_s1[melanoma_idx])
+        critical_alert = None
+        if melanoma_prob >= 0.20:
+            critical_alert = {
+                "flagged": True,
+                "condition": "Melanoma (Malignant)",
+                "confidence": round(melanoma_prob * 100, 2),
+                "is_primary": (primary_disease == "Melanoma"),
+                "advisory": "Clinical safety protocol triggered: elevated melanoma probability detected. Immediate dermoscopy evaluation strongly indicated."
+            }
 
         # Differential Diagnosis (Top 3)
         top_predictions = []
@@ -177,8 +210,12 @@ class DermaSensePipeline:
 
         if is_acne_case:
             with torch.no_grad():
-                logits_s2 = self.model_s2(tensor)
-                probs_s2 = F.softmax(logits_s2, dim=1)[0].cpu().numpy()
+                if use_tta:
+                    logits_s2 = self.model_s2(batch_tensor)
+                    probs_s2 = F.softmax(logits_s2, dim=1).mean(dim=0).cpu().numpy()
+                else:
+                    logits_s2 = self.model_s2(tensor)
+                    probs_s2 = F.softmax(logits_s2, dim=1)[0].cpu().numpy()
 
             s2_idx = int(probs_s2.argmax())
             severity_prob = float(probs_s2[s2_idx])
@@ -210,6 +247,8 @@ class DermaSensePipeline:
                 "metadata": DISEASE_METADATA.get(primary_disease, {})
             },
             "differential_diagnosis": top_predictions,
+            "critical_alert": critical_alert,
+            "tta_enabled": use_tta,
             "is_acne": is_acne_case,
             "acne_severity": severity_info
         }

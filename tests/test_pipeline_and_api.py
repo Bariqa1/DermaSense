@@ -31,7 +31,7 @@ class TestDermaSense(unittest.TestCase):
     # 1. Model Architecture & Tensor Tests
     def test_01_model_shapes(self):
         """Verifies that model architectures produce expected tensor output shapes."""
-        dummy_tensor = torch.randn(2, 3, 224, 224)
+        dummy_tensor = torch.randn(2, 3, 224, 224).to(self.pipeline.device)
         
         # Stage 1
         out_s1 = self.pipeline.model_s1(dummy_tensor)
@@ -42,7 +42,7 @@ class TestDermaSense(unittest.TestCase):
         self.assertEqual(out_s2.shape, (2, 4), "Stage 2 output must be (batch, 4)")
 
         # CustomCNN Baseline
-        base_cnn = CustomCNN(num_classes=4)
+        base_cnn = CustomCNN(num_classes=4).to(self.pipeline.device)
         out_base = base_cnn(dummy_tensor)
         self.assertEqual(out_base.shape, (2, 4), "Custom CNN output must be (batch, 4)")
 
