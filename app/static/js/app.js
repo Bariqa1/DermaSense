@@ -6,13 +6,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const removeBtn = document.getElementById('removeBtn');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const scannerLine = document.getElementById('scannerLine');
+    const latencyBadge = document.getElementById('latencyBadge');
     
+    const engineStatusDot = document.getElementById('engineStatusDot');
+    const engineStatusText = document.getElementById('engineStatusText');
+
     const emptyState = document.getElementById('emptyState');
     const resultsCard = document.getElementById('resultsCard');
+    const printReportBtn = document.getElementById('printReportBtn');
 
     let currentFile = null;
+    let engineDevice = 'CPU';
 
-    // Trigger file chooser
+    // 1. Dynamic Health Check
+    async function checkEngineHealth() {
+        try {
+            engineStatusText.textContent = 'Connecting...';
+            const res = await fetch('/api/health');
+            const data = await res.json();
+            
+            if (data.status === 'online') {
+                engineDevice = (data.device || 'CPU').toUpperCase();
+                engineStatusDot.className = 'status-dot online';
+                engineStatusText.textContent = `Engine Active • ${engineDevice}`;
+                latencyBadge.textContent = 'Ready';
+            } else {
+                engineStatusDot.className = 'status-dot offline';
+                engineStatusText.textContent = 'Weights Missing';
+                latencyBadge.textContent = 'Degraded';
+            }
+        } catch (err) {
+            engineStatusDot.className = 'status-dot offline';
+            engineStatusText.textContent = 'Engine Offline';
+            latencyBadge.textContent = 'Offline';
+        }
+    }
+
+    checkEngineHealth();
+
+    // 2. Trigger file chooser
     dropZone.addEventListener('click', () => fileInput.click());
 
     // Drag & Drop handlers
@@ -51,11 +83,37 @@ document.addEventListener('DOMContentLoaded', () => {
             dropZone.style.display = 'none';
             previewContainer.style.display = 'block';
             analyzeBtn.disabled = false;
+            latencyBadge.textContent = 'Image Ready';
         };
         reader.readAsDataURL(file);
     }
 
-    // Reset Image
+    // 3. Quick Demo Sample Buttons
+    document.querySelectorAll('.btn-sample').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const sampleName = btn.getAttribute('data-sample');
+            const sampleUrl = `/static/samples/${sampleName}.jpg`;
+
+            try {
+                btn.style.opacity = '0.6';
+                const response = await fetch(sampleUrl);
+                const blob = await response.blob();
+                const file = new File([blob], `${sampleName}_sample.jpg`, { type: 'image/jpeg' });
+                
+                handleFile(file);
+                // Auto trigger inference for instantaneous dynamic experience
+                setTimeout(() => {
+                    analyzeBtn.click();
+                }, 300);
+            } catch (err) {
+                console.error('Error loading sample image:', err);
+            } finally {
+                btn.style.opacity = '1';
+            }
+        });
+    });
+
+    // 4. Reset Image
     removeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         currentFile = null;
@@ -64,16 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
         previewContainer.style.display = 'none';
         dropZone.style.display = 'block';
         analyzeBtn.disabled = true;
+        latencyBadge.textContent = 'Ready';
         
         // Hide results
         resultsCard.style.display = 'none';
         emptyState.style.display = 'block';
     });
 
-    // Run Inference
+    // 5. Run Dynamic Inference
     analyzeBtn.addEventListener('click', async () => {
         if (!currentFile) return;
 
+        const startTime = performance.now();
         analyzeBtn.disabled = true;
         analyzeBtn.innerHTML = `
             <svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -83,6 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
             Analyzing Dermoscopy Features...
         `;
         scannerLine.style.display = 'block';
+
+        // Update Dynamic Engine Status
+        engineStatusDot.className = 'status-dot busy';
+        engineStatusText.textContent = 'Processing Lesion...';
+        latencyBadge.textContent = 'Inference running...';
 
         const formData = new FormData();
         formData.append('file', currentFile);
@@ -94,20 +159,32 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const result = await response.json();
+            const elapsed = Math.round(performance.now() - startTime);
 
             if (result.success && result.data) {
+                latencyBadge.textContent = `Latency: ${elapsed}ms`;
                 renderResults(result.data);
+                
+                engineStatusDot.className = 'status-dot online';
+                engineStatusText.textContent = `Completed (${elapsed}ms)`;
+                setTimeout(() => {
+                    engineStatusText.textContent = `Engine Active • ${engineDevice}`;
+                }, 3000);
             } else {
                 alert('Analysis failed: ' + (result.error || 'Unknown error occurred.'));
+                engineStatusDot.className = 'status-dot offline';
+                engineStatusText.textContent = 'Analysis Error';
             }
         } catch (err) {
             console.error(err);
             alert('Server error while performing clinical analysis.');
+            engineStatusDot.className = 'status-dot offline';
+            engineStatusText.textContent = 'Connection Error';
         } finally {
             analyzeBtn.disabled = false;
             analyzeBtn.innerHTML = `
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                    <polygon points="5 3 19 12 5 21 5 3"/>
                 </svg>
                 Run Diagnostic Pipeline
             `;
@@ -115,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 6. Render Dynamic Results
     function renderResults(data) {
         emptyState.style.display = 'none';
         resultsCard.style.display = 'block';
@@ -178,5 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth < 960) {
             resultsCard.scrollIntoView({ behavior: 'smooth' });
         }
+    }
+
+    // 7. Print Clinical Summary
+    if (printReportBtn) {
+        printReportBtn.addEventListener('click', () => {
+            window.print();
+        });
     }
 });

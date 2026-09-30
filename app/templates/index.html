@@ -18,11 +18,10 @@
                 </svg>
             </div>
             <span class="logo-text">DermaSense</span>
-            <span class="logo-badge">Clinical AI v1.0</span>
         </div>
-        <div class="nav-status">
-            <span class="status-dot"></span>
-            <span>Neural Engine Online</span>
+        <div class="nav-status" id="engineStatusBadge" title="Real-time Inference Engine State">
+            <span class="status-dot" id="engineStatusDot"></span>
+            <span id="engineStatusText">Connecting to Engine...</span>
         </div>
     </nav>
 
@@ -50,7 +49,7 @@
                         </svg>
                         Clinical Image Input
                     </h2>
-                    <span style="font-size: 0.8rem; color: var(--text-dim);">JPEG, PNG supported</span>
+                    <span id="latencyBadge" style="font-size: 0.8rem; color: var(--text-dim);">Ready</span>
                 </div>
 
                 <!-- Drop Zone -->
@@ -82,6 +81,25 @@
                     </div>
                 </div>
 
+                <!-- Quick Test Samples -->
+                <div class="samples-wrapper">
+                    <span class="samples-label">Quick Clinical Demo Samples:</span>
+                    <div class="samples-grid">
+                        <button type="button" class="btn-sample" data-sample="acne">
+                            <span>🔴</span> Acne Case
+                        </button>
+                        <button type="button" class="btn-sample" data-sample="eczema">
+                            <span>🟠</span> Eczema Case
+                        </button>
+                        <button type="button" class="btn-sample" data-sample="melanoma">
+                            <span>🟤</span> Melanoma Case
+                        </button>
+                        <button type="button" class="btn-sample" data-sample="clear">
+                            <span>🟢</span> Clear Skin
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Inference Button -->
                 <button id="analyzeBtn" class="btn-primary" disabled>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -109,8 +127,8 @@
                     <p style="font-size: 1.05rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.4rem;">
                         No Examination Data
                     </p>
-                    <p style="font-size: 0.85rem; max-width: 320px; margin: 0 auto;">
-                        Upload a well-lit dermoscopy or close-up facial photograph on the left to generate the diagnostic assessment.
+                    <p style="font-size: 0.85rem; max-width: 340px; margin: 0 auto;">
+                        Upload a well-lit dermoscopy or close-up facial photograph, or choose one of the quick test samples on the left.
                     </p>
                 </div>
 
@@ -172,6 +190,18 @@
                             <strong>Recommended Care Guidance:</strong>
                             <span id="severityAdvice"></span>
                         </div>
+                    </div>
+
+                    <!-- Report Actions -->
+                    <div class="report-actions">
+                        <button type="button" class="btn-report" id="printReportBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
+                            Print Clinical Summary
+                        </button>
                     </div>
 
                     <!-- Clinical Disclaimer -->
