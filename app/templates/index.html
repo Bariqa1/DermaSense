@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DermaSense AI – Facial Skin Disease & Acne Severity Analysis</title>
+    <meta name="description" content="Hierarchical deep learning platform for real-time facial skin condition diagnosis and acne severity grading using EfficientNet-B0.">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 2v20M2 12h20"/>
+                </svg>
+            </div>
+            <span class="logo-text">DermaSense</span>
+            <span class="logo-badge">Clinical AI v1.0</span>
+        </div>
+        <div class="nav-status">
+            <span class="status-dot"></span>
+            <span>Neural Engine Online</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Hero Header -->
+        <header class="hero">
+            <h1>Facial Dermatological Diagnosis & Acne Severity</h1>
+            <p>
+                A high-precision, two-stage deep learning pipeline leveraging transfer learning on 
+                <strong>EfficientNet-B0</strong> to detect multiple facial skin conditions and quantify acne lesion severity.
+            </p>
+        </header>
+
+        <!-- Interactive Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Card: Image Upload & Preview -->
+            <section class="glass-card" aria-label="Image Acquisition">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        Clinical Image Input
+                    </h2>
+                    <span style="font-size: 0.8rem; color: var(--text-dim);">JPEG, PNG supported</span>
+                </div>
+
+                <!-- Drop Zone -->
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-content">
+                        <div class="upload-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                            </svg>
+                        </div>
+                        <p class="drop-zone-text">Drag & drop facial lesion photograph here</p>
+                        <p class="drop-zone-subtext">or click to browse local files</p>
+                    </div>
+                </div>
+
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
+
+                <!-- Image Preview Container -->
+                <div class="preview-container" id="previewContainer">
+                    <img id="previewImage" class="preview-image" alt="Uploaded skin lesion preview">
+                    <div class="scanner-line" id="scannerLine"></div>
+                    <div class="preview-actions">
+                        <button class="btn-icon" id="removeBtn" title="Remove photo" aria-label="Remove photo">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Inference Button -->
+                <button id="analyzeBtn" class="btn-primary" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Run Diagnostic Pipeline
+                </button>
+            </section>
+
+            <!-- Right Card: Diagnostic Evaluation -->
+            <section class="glass-card" aria-label="Diagnostic Report">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        Clinical Diagnostic Report
+                    </h2>
+                    <span style="font-size: 0.8rem; color: var(--text-dim);">Automated AI Triage</span>
+                </div>
+
+                <!-- Empty State Placeholder -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">🔬</div>
+                    <p style="font-size: 1.05rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.4rem;">
+                        No Examination Data
+                    </p>
+                    <p style="font-size: 0.85rem; max-width: 320px; margin: 0 auto;">
+                        Upload a well-lit dermoscopy or close-up facial photograph on the left to generate the diagnostic assessment.
+                    </p>
+                </div>
+
+                <!-- Live Results Display -->
+                <div class="results-card" id="resultsCard">
+                    <!-- Primary Diagnosis Card -->
+                    <div class="diagnosis-header">
+                        <div>
+                            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; display: block; margin-bottom: 2px;">
+                                Primary Finding (Stage 1)
+                            </span>
+                            <div class="diagnosis-title" id="primaryDisease">Diagnosing...</div>
+                            <span class="diagnosis-badge badge-info" id="riskBadge">Pending</span>
+                            <span id="diseaseCategory" style="font-size: 0.8rem; color: var(--text-dim); margin-left: 8px;"></span>
+                        </div>
+                        <div class="confidence-gauge-container">
+                            <div class="confidence-val" id="primaryConfidence">0%</div>
+                            <span class="confidence-label">Prediction Confidence</span>
+                        </div>
+                    </div>
+
+                    <p id="diseaseDesc" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;"></p>
+
+                    <!-- Top 3 Differential Diagnosis -->
+                    <h3 class="section-subtitle">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                        Differential Diagnosis (Top 3 Probabilities)
+                    </h3>
+                    <div class="differential-list" id="differentialList"></div>
+
+                    <!-- Stage 2: Acne Severity (Conditional) -->
+                    <div class="severity-box" id="severityBox">
+                        <div class="severity-title-row">
+                            <div>
+                                <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary-light); font-weight: 700; letter-spacing: 0.5px;">
+                                    Stage 2: Severity Grading
+                                </span>
+                                <div style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-top: 2px;" id="severityLabel">
+                                    Assessing Severity...
+                                </div>
+                            </div>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--accent);" id="severityConfidence"></span>
+                        </div>
+
+                        <!-- 4-Level Visual Meter -->
+                        <div class="severity-meter">
+                            <div class="severity-step" id="sevStep0">Level 0<br><span style="font-size: 0.65rem;">Clear</span></div>
+                            <div class="severity-step" id="sevStep1">Level 1<br><span style="font-size: 0.65rem;">Mild</span></div>
+                            <div class="severity-step" id="sevStep2">Level 2<br><span style="font-size: 0.65rem;">Moderate</span></div>
+                            <div class="severity-step" id="sevStep3">Level 3<br><span style="font-size: 0.65rem;">Severe</span></div>
+                        </div>
+
+                        <!-- Clinical Guidance Card -->
+                        <div class="advice-card">
+                            <strong>Recommended Care Guidance:</strong>
+                            <span id="severityAdvice"></span>
+                        </div>
+                    </div>
+
+                    <!-- Clinical Disclaimer -->
+                    <div class="disclaimer">
+                        <strong>Clinical Decision Support Notice:</strong> This platform is designed as an investigative AI screening prototype. 
+                        It does not replace in-person histopathological biopsy or examination by a certified dermatologist.
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 DermaSense AI Research Initiative. Engineered for Dermatological Decision Support.</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

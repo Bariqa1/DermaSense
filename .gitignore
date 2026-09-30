@@ -1,0 +1,65 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# PyTorch Checkpoints & Large Model Weights
+*.pth
+*.pt
+*.bin
+*.onnx
+weights/*.pth
+weights/*.pt
+!weights/.gitkeep
+
+# Datasets and local image uploads
+data/
+datasets/
+uploads/
+*.jpg
+*.jpeg
+*.png
+!app/static/images/*.png
+!app/static/images/*.jpg
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
