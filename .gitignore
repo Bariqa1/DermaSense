@@ -48,6 +48,9 @@ uploads/
 *.png
 !app/static/images/*.png
 !app/static/images/*.jpg
+!results/*.png
+!app/static/results/*.png
+!app/static/samples/*.jpg
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
