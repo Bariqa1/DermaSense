@@ -243,8 +243,8 @@
                         <tr>
                             <td><strong>Custom CNN (Baseline)</strong></td>
                             <td>3-Layer ConvNet (Trained from Scratch)</td>
-                            <td>61.4%</td>
-                            <td>0.598</td>
+                            <td>42.0%</td>
+                            <td>0.405</td>
                             <td><span class="table-badge badge-neutral">Baseline Benchmark</span></td>
                         </tr>
                         <tr>
@@ -255,25 +255,25 @@
                             <td><span class="table-badge badge-success">Deep Transfer Learning</span></td>
                         </tr>
                         <tr>
-                            <td><strong>Hybrid: Logistic Regression</strong></td>
-                            <td>EfficientNet Embeddings + PCA (95%)</td>
-                            <td>83.1%</td>
-                            <td>0.827</td>
-                            <td><span class="table-badge badge-info">Classical ML</span></td>
-                        </tr>
-                        <tr class="highlight-row">
-                            <td><strong>Hybrid: SVM (RBF Kernel)</strong></td>
-                            <td>EfficientNet Embeddings + PCA (95%)</td>
-                            <td><strong>85.6%</strong></td>
-                            <td><strong>0.852</strong></td>
-                            <td><span class="table-badge badge-top">⭐ Top Performer</span></td>
-                        </tr>
-                        <tr>
                             <td><strong>Hybrid: MLP Classifier</strong></td>
                             <td>EfficientNet Embeddings + PCA (95%)</td>
                             <td>84.8%</td>
                             <td>0.844</td>
                             <td><span class="table-badge badge-info">Dual-Head Neural Net</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hybrid: SVM (RBF Kernel)</strong></td>
+                            <td>EfficientNet Embeddings + PCA (95%)</td>
+                            <td>85.6%</td>
+                            <td>0.852</td>
+                            <td><span class="table-badge badge-info">Classical Kernel Model</span></td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>Hybrid: Logistic Regression</strong></td>
+                            <td>EfficientNet Embeddings + PCA (95%)</td>
+                            <td><strong>87.02%</strong></td>
+                            <td><strong>0.875</strong></td>
+                            <td><span class="table-badge badge-top">⭐ Top Performer (Melanoma 99%)</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -314,7 +314,7 @@
                     <div class="chart-img-container">
                         <img src="/static/results/confusion_matrix_stage1.png" alt="Stage 1 Confusion Matrix" loading="lazy">
                     </div>
-                    <p class="chart-caption">Class-wise prediction distribution for 9 facial skin conditions (Eczema, Melanoma, BCC, etc.).</p>
+                    <p class="chart-caption">Class-wise prediction distribution for 9 skin conditions (featuring 99% precision on malignant Melanoma with minimal false alarms).</p>
                 </div>
 
                 <!-- Chart 4: Stage 2 Confusion Matrix -->
