@@ -5,7 +5,7 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C.svg)](https://pytorch.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688.svg)](https://fastapi.tiangolo.com/)
 [![Backbone](https://img.shields.io/badge/Backbone-EfficientNet--B0-green.svg)](https://arxiv.org/abs/1905.11946)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)](LICENSE)
 
 **DermaSense** is a two-stage clinical decision support system designed to assist healthcare professionals, smart mirror hardware, and dermatological researchers in early detection of facial skin conditions and granular severity quantification of acne vulgaris.
 
@@ -237,5 +237,7 @@ Open your browser and navigate to: **`http://localhost:8000`**
 
 ---
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Proprietary Rights & License
+© 2026 Bariqa. All Rights Reserved.
+
+This software, including all source code, models, neural network weights, architectures, documentation, and evaluation assets, is strictly proprietary. No permission is granted for copying, distribution, modification, reverse engineering, deployment, or commercial/non-commercial usage without prior express written permission. See the [LICENSE](LICENSE) file for legal details.
