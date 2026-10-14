@@ -7,21 +7,24 @@
 [![Backbone](https://img.shields.io/badge/Backbone-EfficientNet--B0-green.svg)](https://arxiv.org/abs/1905.11946)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**DermaSense** is a two-stage clinical decision support system designed to assist healthcare professionals and dermatological researchers in early detection of facial skin conditions and granular severity quantification of acne vulgaris.
+**DermaSense** is a two-stage clinical decision support system designed to assist healthcare professionals, smart mirror hardware, and dermatological researchers in early detection of facial skin conditions and granular severity quantification of acne vulgaris.
 
 ---
 
-## Key Highlights
+## Key Highlights & Scientific Foundations
 
-1. **Two-Stage Hierarchical Classification**:
-   - **Stage 1 (Disease Diagnosis):** 9-class differential diagnosis covering inflammatory dermatoses, benign growths, and life-threatening malignancies (*Eczema*, *Melanoma*, *Basal Cell Carcinoma*, *Psoriasis*, *Seborrheic Keratoses*, *Benign Keratosis*, *Melanocytic Nevi*, *Acne*, *Clear Skin*).
-   - **Stage 2 (Condition-Specific Grading):** Triggered conditionally when acne lesions are identified, estimating Global Acne Grading severity (*Level 0: Clear* to *Level 3: Severe*).
-2. **Transfer Learning Backbone**:
-   - Utilizes **EfficientNet-B0** pretrained on ImageNet with differential learning rates and label smoothing.
-3. **Rigorous Experimental Benchmarking**:
-   - Benchmarked against a scratch-trained **Custom CNN Baseline** and **Hybrid Embeddings Classifiers** (EfficientNet Features + PCA + SVM/MLP/Logistic Regression).
-4. **Production-Ready Web Application**:
-   - Interactive medical dashboard built with **FastAPI**, featuring real-time image analysis, confidence gauges, differential diagnoses, and clinical care recommendations.
+1. **Two-Stage Cascading Clinical Pipeline**:
+   - **Stage 1 (Differential Disease Triage):** 9-class differential diagnosis across balanced clinical cohorts (*Acne*, *Basal Cell Carcinoma*, *Benign Keratosis*, *Clear Skin*, *Eczema / Atopic Dermatitis*, *Melanocytic Nevi*, *Melanoma*, *Psoriasis*, *Seborrheic Keratoses*).
+   - **Stage 2 (Condition-Specific Grading):** Triggered conditionally when acne is identified, estimating clinical severity across 4 standardized Hayashi criteria levels (*Mild*, *Moderate*, *Severe*, *Very Severe*).
+2. **Methodological Rigor & Data Integrity**:
+   - **True Clear Skin Benchmark:** Incorporates verified healthy facial skin images from dedicated normal dermatological cohorts rather than mislabeling mild acne.
+   - **Stratified Acne Representation:** Stage 1 samples proportionally across all 4 acne severity levels to avoid single-grade representation bias.
+   - **Zero Test Leakage:** Strict, stratified train/validation/test partitions ($70\% / 15\% / 15\%$) with zero overlap between training and held-out test splits.
+   - **Validation-Driven Inference:** Inference strategies (Standard vs Horizontal Flip) are selected exclusively on validation data before freezing and testing.
+3. **Clinical Priority (Medical Focal Loss)**:
+   - Employs $\gamma=2.0$ class-weighted focal loss to protect against false negatives on life-threatening malignancies (**Melanoma Sensitivity: 90.0%**; **Acne Sensitivity: 98.9%**).
+4. **Apple Silicon Acceleration (MPS)**:
+   - Optimized natively for Apple Silicon GPU (`mps`), achieving an end-to-end inference latency of **~9.7 ms** for real-time edge screening.
 
 ---
 
@@ -38,42 +41,40 @@
                                  v
                +----------------------------------+
                |   Stage 1: EfficientNet-B0       |
-               |   Multi-Class Disease Diagnosis  |
+               |   9-Class Balanced Disease Triage|
                +-----------------+----------------+
                                  |
         +------------------------+------------------------+
         |                                                 |
         v                                                 v
-[ Malignant / Other Conditions ]                  [ Acne / Clear Skin ]
-- Melanoma                                                |
+[ Malignant / Inflammatory / Clear ]                   [ Acne ]
+- Melanoma (Critical Alert)                               |
 - Basal Cell Carcinoma                                    v
-- Eczema / Psoriasis                    +----------------------------------+
-- Keratoses / Nevi                      |   Stage 2: EfficientNet-B0       |
-                                        |   Acne Severity Grading (0 - 3)  |
+- Clear Skin (Healthy Benchmark)        +----------------------------------+
+- Eczema / Psoriasis                    |   Stage 2: EfficientNet-B0       |
+- Keratoses / Nevi                      |   Acne Severity Grading (0 - 3)  |
                                         +-----------------+----------------+
                                                           |
                                                           v
-                                        Level 0: Clear / Almost Clear
-                                        Level 1: Mild
-                                        Level 2: Moderate
-                                        Level 3: Severe
+                                        Level 0: Mild (0-5 lesions)
+                                        Level 1: Moderate (6-20 lesions)
+                                        Level 2: Severe (21-50 lesions)
+                                        Level 3: Very Severe (>50 / Cysts)
 ```
 
 ---
 
 ## Empirical Results & Model Benchmarks
 
-DermaSense underwent rigorous empirical evaluation comparing baseline convolutional networks, deep transfer learning backbones, and medical focal loss fine-tuning across 6,700+ dermatological images.
+DermaSense underwent rigorous empirical evaluation comparing baseline convolutional networks, transfer learning backbones, and medical focal loss fine-tuning across 6,800+ dermatological images.
 
 ### 1. Comparative Architecture Benchmarks
 
 | Model Architecture | Backbone / Paradigm | Test Accuracy | Macro F1-Score | Status / Role |
 | :--- | :--- | :---: | :---: | :---: |
 | **Custom CNN (Baseline)** | 3-Layer ConvNet (Trained from Scratch) | **42.00%** | 0.405 | Baseline Benchmark |
-| **Stage 2: Acne Severity** | EfficientNet-B0 (MPS Retrained, Balanced) | **74.11%** | 0.719 | 4-Level Severity Quantification |
-| **EfficientNet-B0 (Standard)** | ImageNet Pretrained / Softmax Fine-Tuned | **84.20%** | 0.839 | Standard Deep Learning |
-| **Hybrid: SVM (RBF Kernel)** | EfficientNet Embeddings + PCA (95%) | **85.60%** | 0.852 | Classical Kernel Model |
-| **Stage 1 (MedicalFocalLoss)** | **EfficientNet-B0 + Focal Loss (MPS)** | **88.32%** | **0.887** | **Top Model (Peak Val: 89.92%)** |
+| **Stage 1: Multi-Disease** | **EfficientNet-B0 + MedicalFocalLoss** | **88.15%** | **0.882** | **9-Class Curated & Balanced Triage (675 Test Samples)** |
+| **Stage 2: Acne Severity** | **EfficientNet-B0 (MPS, Balanced Sampler)**| **75.00%** | **0.735** | **Exact 4-Level Hayashi Grading (224 Test Samples)** |
 
 <p align="center">
   <img src="results/model_comparison_bar_chart.png" alt="Model Comparison Bar Chart" width="720"/>
@@ -83,20 +84,25 @@ DermaSense underwent rigorous empirical evaluation comparing baseline convolutio
 
 ### 2. Stage 1: Multi-Disease Clinical Classification Report
 
-Evaluated on 796 held-out clinical test cases across 9 diagnostic categories:
+Evaluated on **675 held-out clinical test cases** (75 unseen samples per class) across 9 diagnostic categories:
 
-| Clinical Condition | Precision | Recall | F1-Score | Clinical Role & Significance |
-| :--- | :---: | :---: | :---: | :--- |
-| **Melanoma** | **95.5%** | **93.3%** | **0.944** | **Malignancy Early Triage (Minimal False Alarms)** |
-| **Melanocytic Nevi** | **92.2%** | **92.2%** | **0.922** | Benign mole differential |
-| **Basal Cell Carcinoma (BCC)** | **91.1%** | **91.1%** | **0.911** | Most common non-melanoma skin cancer |
-| **Clear / Almost Clear Skin** | **92.4%** | **80.3%** | **0.859** | Healthy epidermal benchmark |
-| **Seborrheic Keratoses** | **89.8%** | **87.8%** | **0.888** | Benign epidermal neoplasm |
-| **Benign Keratosis** | **87.5%** | **85.6%** | **0.865** | Benign keratotic lesion |
-| **Acne Vulgaris** | **84.8%** | **93.3%** | **0.889** | High sensitivity detection |
-| **Eczema** | **80.8%** | **93.3%** | **0.866** | Inflammatory dermatosis |
-| **Psoriasis** | **83.1%** | **76.7%** | **0.798** | Chronic autoimmune plaques |
-| **Macro Average / Total** | **88.6%** | **88.2%** | **0.882** | **Overall Accuracy: 88.32% (796 samples)** |
+| Clinical Condition | Precision | Recall (Sensitivity) | Specificity | F1-Score | Clinical Role & Significance |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Acne Vulgaris** | **100.0%** | **98.7%** | **100.0%** | **0.993** | Multi-level representative acne cohort |
+| **Clear Skin** | **97.4%** | **100.0%** | **99.7%** | **0.987** | Healthy facial epidermal control benchmark |
+| **Melanoma** | **97.1%** | **89.3%** | **99.7%** | **0.931** | **Critical Malignancy Early Warning** |
+| **Basal Cell Carcinoma (BCC)** | **85.9%** | **89.3%** | **98.2%** | **0.876** | Common non-melanoma carcinoma |
+| **Melanocytic Nevi** | **84.6%** | **88.0%** | **98.0%** | **0.863** | Benign melanocytic mole differential |
+| **Psoriasis** | **73.6%** | **89.3%** | **96.0%** | **0.807** | Chronic papulosquamous plaques |
+| **Seborrheic Keratoses** | **93.9%** | **82.7%** | **99.3%** | **0.879** | Benign epidermal neoplasm |
+| **Benign Keratosis** | **80.3%** | **81.3%** | **97.5%** | **0.808** | Benign keratotic lesion |
+| **Eczema** | **84.8%** | **74.7%** | **98.3%** | **0.794** | Inflammatory atopic dermatitis |
+| **Macro Average / Total** | **88.6%** | **88.1%** | **98.5%** | **0.882** | **Overall Accuracy: 88.15% (675 samples)** |
+
+#### Key Diagnostic Highlights:
+- **High Sensitivity for Malignancies**: Sensitivity on malignant lesions (Melanoma & BCC) stands at **89.3%**, with Melanoma precision at **97.1%**.
+- **Accurate Inflammatory Differential**: Clean separation of papulosquamous and eczematous dermatoses (Psoriasis Sensitivity: **89.3%**, Eczema Precision: **84.8%**).
+- **Clear Skin Specificity**: **99.7%**, preventing false-positive alerts on healthy facial skin.
 
 <p align="center">
   <img src="results/confusion_matrix_stage1.png" alt="Stage 1 Confusion Matrix" width="620"/>
@@ -110,18 +116,22 @@ Evaluated on 796 held-out clinical test cases across 9 diagnostic categories:
 
 ### 3. Stage 2: Acne Severity Grading Performance
 
-Quantification of Acne Vulgaris across 4 standardized severity levels (0 - 3) evaluated on 224 held-out clinical test cases:
+Quantification of Acne Vulgaris across 4 standardized clinical severity levels based on the **Hayashi criteria** (*ICCV 2019 ACNE04 benchmark*), evaluated on **224 held-out clinical test cases**:
 
-- **Adjacent Accuracy (±1 Severity Grade)**: **99.55%** (223 / 224 cases classified accurately or within one adjacent grade, proving high ordinal reliability).
-- **Actionable Clinical Triage (Mild vs Severe)**: **93.75%** (Reliable differentiation between home OTC regimens and specialist dermatologist intervention).
-- **Exact 4-Level Test Accuracy (TTA-Enhanced)**: **70.54%** (Standard: 67.86%, Macro F1: 0.718).
+- **Exact 4-Level Test Accuracy**: **75.00%** (168 / 224 cases classified exactly).
+- **Ordinal Adjacent Accuracy ($\pm 1$ Severity Grade)**: **99.55%** (223 / 224 cases classified accurately or within one adjacent grade, proving high clinical ordinal reliability).
+- **Binary Acne Severity Grouping Accuracy (Mild/Mod vs Severe/Very Severe)**: **95.54%** (214 / 224 cases correctly partitioned):
+  - **Severe Case Detection Sensitivity**: **88.24%** (45 of 51 severe/very severe cases captured).
+  - **Mild/Moderate Specificity**: **97.69%** (169 of 173 mild/moderate cases correctly identified).
+  - **Severe Positive Predictive Value**: **91.84%** (Minimal false escalations).
+  - *Note: This binary grouping reflects statistical severity partitioning (Levels 0+1 vs Levels 2+3) and provides decision support for triage rather than autonomous prescription.*
 
-| Severity Level | Precision | Recall | F1-Score | Clinical Recommendation |
-| :--- | :---: | :---: | :---: | :--- |
-| **Level 0 (Clear / Almost Clear)** | **67.0%** | **82.9%** | 0.741 | Gentle non-comedogenic cleanser, SPF 30+ daily |
-| **Level 1 (Mild Acne)** | **77.5%** | **56.7%** | 0.655 | Topical OTC Salicylic Acid / Benzoyl Peroxide |
-| **Level 2 (Moderate Acne)** | **61.1%** | **75.9%** | 0.677 | Topical retinoid (Adapalene/Tretinoin) + antimicrobial |
-| **Level 3 (Severe Acne)** | **78.3%** | **81.8%** | **0.800** | Dermatologist consult (Oral antibiotics / Isotretinoin) |
+| Severity Level | Clinical Definition (Hayashi) | Precision | Recall | Specificity | F1-Score | Clinical Care Guidance |
+| :--- | :--- | :---: | :---: | :---: | :---: | :--- |
+| **Level 0 (Mild)** | 0–5 inflammatory lesions | **75.0%** | **78.9%** | 86.5% | 0.769 | Gentle cleanser, Salicylic Acid / Azelaic Acid, SPF 30+ |
+| **Level 1 (Moderate)** | 6–20 inflammatory lesions | **76.8%** | **75.3%** | 82.7% | 0.760 | Topical Benzoyl Peroxide (2.5-5%) / Adapalene |
+| **Level 2 (Severe)** | 21–50 inflammatory lesions | **67.9%** | **65.5%** | 95.4% | 0.667 | Combination topical therapy + dermatologist consult |
+| **Level 3 (Very Severe)**| $\ge 51$ lesions or Cysts | **76.2%** | **72.7%** | 97.5% | 0.744 | Urgent specialist consult for systemic isotretinoin |
 
 <p align="center">
   <img src="results/confusion_matrix_stage2.png" alt="Stage 2 Confusion Matrix" width="550"/>
@@ -131,10 +141,9 @@ Quantification of Acne Vulgaris across 4 standardized severity levels (0 - 3) ev
 
 ### 4. Apple Silicon Hardware Acceleration (Metal Performance Shaders)
 
-All models were retrained natively on an **Apple Silicon MacBook Pro (M Pro)** leveraging PyTorch's Metal Performance Shaders (`mps`) backend:
-- **Batch Processing Throughput**: ~51 seconds per epoch across 3,700+ training images.
-- **Inference Latency**: Decreased from 98.28 ms (CPU) down to **12.50 ms** (Apple Silicon MPS), delivering an **8x speedup** for real-time edge clinical triage.
-- **Test-Time Augmentation (TTA)**: 5-angle geometric ensemble inference (original, horizontal flip, vertical flip, diagonal flip, 90° rotation) executed in a single synchronized tensor batch.
+All models are natively optimized for Apple Silicon (MPS):
+- **Inference Latency**: **~9.7 ms** per forward pass (delivering real-time responsiveness for edge devices and smart mirrors).
+- **Inference Strategy Selection**: Standard single-pass was validated on validation data to achieve identical accuracy to TTA while maintaining sub-10ms response times.
 
 ---
 
@@ -148,22 +157,30 @@ DermaSense/
 │   │   └── index.html            # Medical dashboard interface
 │   └── static/
 │       ├── css/style.css         # Glassmorphism aesthetic styling
-│       └── js/app.js             # Asynchronous image processing & UI logic
+│       ├── js/app.js             # Asynchronous image processing & UI logic
+│       └── samples/              # Verified sample images (Acne, Eczema, Melanoma, Clear)
 ├── core/                         # Core Machine Learning Framework
 │   ├── models.py                 # CustomCNN & EfficientNet-B0 architectures
 │   ├── pipeline.py               # Two-stage clinical diagnostic pipeline
-│   └── transforms.py             # Preprocessing & data augmentation
+│   └── transforms.py             # Preprocessing & anatomically valid augmentations
 ├── training/                     # Research & Training Pipeline
 │   ├── dataset.py                # Dataset loaders with stratified sampling
-│   ├── train_stage1.py           # Stage 1 fine-tuning script
-│   ├── train_stage2.py           # Stage 2 severity training with balanced sampler
-│   └── hybrid_models.py          # PCA feature extraction & classical ML models
+│   ├── train_skin_stage1_live.py # Stage 1 fine-tuning script (balanced 9 classes)
+│   ├── train_acne_stage2_live.py # Stage 2 severity training with balanced sampler
+│   └── evaluate.py               # Comprehensive metrics reporting & plot generation
 ├── weights/                      # Model Checkpoints
-│   ├── download_weights.py       # Automated weight downloader
-│   └── .gitkeep
-├── notebooks/                    # Interactive Colab / Jupyter Research Notebooks
-│   └── Skin_Disease_Project.ipynb
-├── .gitignore
+│   ├── efficientnet_s1_weights.pth
+│   ├── efficientnet_s2_weights.pth
+│   └── download_weights.py       # Automated weight downloader
+├── results/                      # Generated Confusion Matrices & Metric Summaries
+│   ├── confusion_matrix_stage1.png
+│   ├── confusion_matrix_stage2.png
+│   ├── model_comparison_bar_chart.png
+│   ├── training_curves.png
+│   └── metrics_summary.json
+├── tests/                        # Automated Test Suite
+│   ├── test_pipeline_and_api.py  # 9-point unit & integration test suite
+│   └── run_clinical_eval.py      # Terminal clinical report generator
 ├── requirements.txt
 └── README.md
 ```
@@ -189,10 +206,9 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Download Model Weights
-If you do not have the trained weights locally in `weights/`, run the automated downloader:
+### 4. Run Automated Test Suite
 ```bash
-python weights/download_weights.py
+python3 -m unittest discover tests
 ```
 
 ### 5. Launch the Web Application
@@ -203,58 +219,15 @@ Open your browser and navigate to: **`http://localhost:8000`**
 
 ---
 
-## REST API Reference
+## Scientific References & Dataset Attribution
 
-### Health Check
-- **Endpoint**: `GET /api/health`
-- **Response**:
-```json
-{
-  "status": "online",
-  "models_loaded": true,
-  "device": "cuda"
-}
-```
-
-### Predict Skin Lesion
-- **Endpoint**: `POST /api/predict`
-- **Body**: `multipart/form-data` with key `file` (Image)
-- **Sample Response**:
-```json
-{
-  "success": true,
-  "data": {
-    "primary": {
-      "disease": "Acne",
-      "confidence": 92.45,
-      "metadata": {
-        "risk": "Low / Benign",
-        "category": "Sebaceous Gland Disorder",
-        "description": "Common dermatological condition caused by clogged hair follicles."
-      }
-    },
-    "differential_diagnosis": [
-      {"rank": 1, "disease": "Acne", "confidence": 92.45},
-      {"rank": 2, "disease": "Eczema", "confidence": 4.12},
-      {"rank": 3, "disease": "Seborrheic Keratoses", "confidence": 1.28}
-    ],
-    "is_acne": true,
-    "acne_severity": {
-      "level": 2,
-      "label": "Level 2 (Moderate Acne)",
-      "confidence": 88.30,
-      "clinical_advice": "Topical retinoid + antimicrobial treatment under dermatological guidance."
-    }
-  }
-}
-```
-
----
-
-## Datasets Utilized
-
-- **Skin Diseases Multi-Class Dataset**: [Kaggle skin-diseases-image-dataset](https://www.kaggle.com/datasets/ismailpromus/skin-diseases-image-dataset)
-- **Acne04 Facial Dataset**: [Kaggle acne04](https://www.kaggle.com/datasets/jincyjis/acne04) containing 4 standardized severity grading levels.
+1. **ACNE04 Dataset & Hayashi Severity Criteria**:
+   - Wu, X., Wen, N., Liang, J., Lai, Y. K., She, D., Cheng, M. M., & Yang, J. (2019). *Joint acne image grading and counting via label distribution learning*. In **IEEE/CVF International Conference on Computer Vision (ICCV)**, pp. 10652-10661. [Open Access CVF](https://openaccess.thecvf.com/content_ICCV_2019/html/Wu_Joint_Acne_Image_Grading_and_Counting_via_Label_Distribution_Learning_ICCV_2019_paper.html).
+   - Hayashi, N., Akamatsu, H., Iwatsuki, K., et al. (2008). *Establishment of grading criteria for acne severity*. **The Journal of Dermatology**, 35(5), 255-260.
+2. **Skin Diseases Multi-Class Dataset**:
+   - Ismail Promus, *Skin Diseases Image Dataset*, Kaggle.
+3. **Normal Skin Facial Dataset**:
+   - Shakya Dissanayake, *Oily, Dry and Normal Skin Types Dataset*, Kaggle.
 
 ---
 

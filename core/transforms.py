@@ -14,13 +14,12 @@ def get_train_transforms_s1():
     ])
 
 def get_train_transforms_s2():
-    """Augmentation pipeline for Stage 2 (Acne severity grading)"""
+    """Augmentation pipeline for Stage 2 (Acne severity grading) - anatomically valid facial augmentations"""
     return transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomVerticalFlip(),
-        transforms.RandomRotation(20),
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.01),
+        transforms.RandomRotation(10),
+        transforms.ColorJitter(brightness=0.15, contrast=0.15, saturation=0.15),
         transforms.ToTensor(),
         transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD)
     ])

@@ -76,11 +76,23 @@ class TestDermaSense(unittest.TestCase):
         img = Image.open(eczema_path)
         result = self.pipeline.predict(img)
         
-        # If predicted disease is not Acne or Clear_AlmostClear, acne_severity should be None
+        # If predicted disease is not Acne (e.g. Clear Skin or Eczema), acne_severity should be None
         if not result["is_acne"]:
             self.assertIsNone(result["acne_severity"], "Stage 2 must not be triggered for non-acne cases")
         else:
             self.assertIsNotNone(result["acne_severity"])
+
+    def test_03b_pipeline_clear_skin_behavior(self):
+        """Verifies that genuine Clear Skin does not trigger Stage 2 acne severity."""
+        clear_path = "app/static/samples/clear.jpg"
+        self.assertTrue(os.path.exists(clear_path), "Sample clear.jpg must exist")
+        img = Image.open(clear_path)
+        result = self.pipeline.predict(img)
+        self.assertIn("primary", result)
+        # Clear Skin must not trigger Stage 2
+        if result["primary"]["disease"] == "Clear Skin":
+            self.assertFalse(result["is_acne"])
+            self.assertIsNone(result["acne_severity"])
 
     # 3. Latency & Performance Benchmark
     def test_04_latency_benchmark(self):

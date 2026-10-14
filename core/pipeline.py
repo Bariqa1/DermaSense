@@ -11,7 +11,7 @@ STAGE1_CLASSES: List[str] = [
     "Acne",
     "Basal Cell Carcinoma",
     "Benign Keratosis",
-    "Clear_AlmostClear",
+    "Clear Skin",
     "Eczema",
     "Melanocytic Nevi",
     "Melanoma",
@@ -20,10 +20,10 @@ STAGE1_CLASSES: List[str] = [
 ]
 
 SEVERITY_CLASSES: List[str] = [
-    "Level 0 (Clear / Almost Clear)",
-    "Level 1 (Mild Acne)",
-    "Level 2 (Moderate Acne)",
-    "Level 3 (Severe Acne)"
+    "Level 0 (Mild Acne)",
+    "Level 1 (Moderate Acne)",
+    "Level 2 (Severe Acne)",
+    "Level 3 (Very Severe Acne)"
 ]
 
 DISEASE_METADATA: Dict[str, Dict[str, str]] = {
@@ -45,10 +45,10 @@ DISEASE_METADATA: Dict[str, Dict[str, str]] = {
         "description": "Non-cancerous skin lesion commonly appearing with aging. Usually harmless unless irritated.",
         "badge_color": "success"
     },
-    "Clear_AlmostClear": {
+    "Clear Skin": {
         "risk": "Healthy",
         "category": "Normal Skin",
-        "description": "No significant dermatological lesions or active inflammation detected.",
+        "description": "Healthy facial epidermis benchmark with no significant active lesions or inflammatory disease.",
         "badge_color": "success"
     },
     "Eczema": {
@@ -85,23 +85,23 @@ DISEASE_METADATA: Dict[str, Dict[str, str]] = {
 
 SEVERITY_GUIDELINES: Dict[int, Dict[str, str]] = {
     0: {
-        "title": "Clear / Almost Clear",
-        "action": "Maintain daily hygiene with a non-comedogenic gentle cleanser and SPF 30+ sunscreen.",
-        "badge": "success"
-    },
-    1: {
-        "title": "Mild Acne",
-        "action": "Topical OTC agents (Salicylic Acid 2% or Benzoyl Peroxide 2.5-5%). Avoid picking or physical scrubs.",
+        "title": "Mild Acne (0-5 Lesions)",
+        "action": "Maintain daily hygiene with a gentle non-comedogenic cleanser, 2% Salicylic Acid or Azelaic Acid, and daily broad-spectrum SPF 30+.",
         "badge": "info"
     },
+    1: {
+        "title": "Moderate Acne (6-20 Lesions)",
+        "action": "Topical OTC Benzoyl Peroxide (2.5-5%) and/or topical retinoid (Adapalene). Avoid physical scrubs and monitor for 6-8 weeks.",
+        "badge": "warning"
+    },
     2: {
-        "title": "Moderate Acne",
-        "action": "Topical retinoid (Adapalene/Tretinoin) + topical antimicrobial. Consult a dermatologist if persistent.",
+        "title": "Severe Acne (21-50 Lesions)",
+        "action": "Elevated inflammatory lesions. Combination topical retinoids + topical/oral antimicrobials; dermatologist evaluation advised.",
         "badge": "warning"
     },
     3: {
-        "title": "Severe Acne",
-        "action": "High risk of scarring. Immediate medical dermatology consultation recommended for systemic therapies.",
+        "title": "Very Severe Acne (>50 Lesions / Cysts)",
+        "action": "High risk of permanent scarring and nodulocystic lesions. Urgent specialist dermatologist consultation required for systemic isotretinoin evaluation.",
         "badge": "danger"
     }
 }
@@ -156,13 +156,10 @@ class DermaSensePipeline:
         base_tensor = self.transforms(image)
 
         if use_tta:
-            # Test-Time Augmentation: 5 distinct geometric orientations for clinical robustness
+            # Test-Time Augmentation: Natural horizontal mirror flip for clinical facial symmetry
             t_orig = base_tensor
             t_hflip = torch.flip(base_tensor, dims=[2])
-            t_vflip = torch.flip(base_tensor, dims=[1])
-            t_hvflip = torch.flip(base_tensor, dims=[1, 2])
-            t_rot = torch.rot90(base_tensor, k=1, dims=[1, 2])
-            batch_tensor = torch.stack([t_orig, t_hflip, t_vflip, t_hvflip, t_rot]).to(self.device)
+            batch_tensor = torch.stack([t_orig, t_hflip]).to(self.device)
 
             # Stage 1: Diagnosis with TTA Ensemble Averaging
             with torch.no_grad():
@@ -204,9 +201,9 @@ class DermaSensePipeline:
                 "metadata": DISEASE_METADATA.get(d_name, {})
             })
 
-        # Stage 2: Acne Severity (Triggered if primary or high secondary is Acne)
+        # Stage 2: Acne Severity (Triggered ONLY if diagnosis is Acne)
         severity_info = None
-        is_acne_case = primary_disease in ["Acne", "Clear_AlmostClear"]
+        is_acne_case = (primary_disease == "Acne")
 
         if is_acne_case:
             with torch.no_grad():
